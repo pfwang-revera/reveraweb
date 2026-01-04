@@ -339,32 +339,24 @@ const initTimeline = (containerId, drawId) => {
 // ===== TIMELINE STEPPER =====
 const initTimelineStepper = () => {
   const container = document.querySelector('.timeline-stepper');
-  const draw = document.querySelector('.timeline-stepper .timeline-path');
-  if (!container || !draw) return;
-
-  const pathLen = draw.getTotalLength();
-  draw.style.strokeDasharray = `${pathLen} ${pathLen}`;
-  draw.style.strokeDashoffset = pathLen;
+  const line = document.querySelector('.timeline-line');
+  const steps = container?.querySelectorAll('.timeline-step') || [];
+  if (!container || !line || !steps.length) return;
 
   const updateLine = () => {
     const rect = container.getBoundingClientRect();
     const vh = window.innerHeight;
-    const steps = container.querySelectorAll('.timeline-step');
-    let lastVisibleStep = -1;
+    let lastVisibleIndex = -1;
 
     steps.forEach((step, i) => {
       const stepRect = step.getBoundingClientRect();
-      const isVisible = stepRect.top < vh * 0.85 && stepRect.bottom > 0;
-      if (isVisible) lastVisibleStep = i;
+      const isVisible = stepRect.top < vh * 0.8 && stepRect.bottom > 0;
+      if (isVisible) lastVisibleIndex = i;
     });
 
-    const totalSteps = steps.length;
-    const progress = Math.max(0, Math.min(1, (lastVisibleStep + 1) / totalSteps));
-    draw.style.strokeDashoffset = Math.round(pathLen * (1 - progress));
-
+    const progress = Math.max(0, Math.min(1, (lastVisibleIndex + 1) / steps.length));
     const containerHeight = container.offsetHeight;
-    const pathHeight = containerHeight - 100;
-    draw.setAttribute('d', `M0 0 V${Math.max(0, progress * pathHeight)}`);
+    line.style.height = Math.round(progress * containerHeight) + 'px';
   };
 
   const io = new IntersectionObserver(entries => {
@@ -375,14 +367,10 @@ const initTimelineStepper = () => {
     });
   }, { threshold: 0.2 });
 
-  const steps = container.querySelectorAll('.timeline-step');
   steps.forEach(s => io.observe(s));
-
   window.addEventListener('scroll', updateLine, { passive: true });
   window.addEventListener('resize', updateLine);
-
   setTimeout(updateLine, 100);
-  setTimeout(() => updateLine(), 500);
 };
 
   const pathLen = draw.getTotalLength();
