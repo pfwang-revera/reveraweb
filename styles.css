@@ -780,11 +780,11 @@ input:focus, textarea:focus{ box-shadow: 0 0 0 3px rgba(226,27,47,.35); }
   }
 }
 
-.timeline-step.reveal.is-in .step-content,
-.timeline-step.is-in .step-content{
+.timeline-step.is-in .step-left,
+.timeline-step.is-in .step-right{
   opacity: 1;
   transform: translateY(0);
-  box-shadow: 0 8px 24px rgba(226,27,47,.18);
+  box-shadow: 0 6px 20px rgba(226,27,47,.15);
 }
 
 /* Coverage steps */
