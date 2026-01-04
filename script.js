@@ -7,24 +7,42 @@ onScrollHeader();
 document.getElementById('year')?.append?.(new Date().getFullYear());
 
 // ===== LANGUAGE MENU =====
-const langBtn = document.getElementById('langBtn');
-const langMenu = document.getElementById('langMenu');
-const langLabel = document.getElementById('langLabel');
-const setLangMenu = open => {
-  langBtn?.setAttribute('aria-expanded', String(open));
-  langMenu?.setAttribute('aria-hidden', String(!open));
+const setupLanguageMenu = () => {
+  const langBtn = document.getElementById('langBtn');
+  const langMenu = document.getElementById('langMenu');
+  const langLabel = document.getElementById('langLabel');
+  
+  if (!langBtn || !langMenu || !langLabel) return;
+
+  const setLangMenu = open => {
+    langBtn.setAttribute('aria-expanded', String(open));
+    langMenu.setAttribute('aria-hidden', String(!open));
+  };
+
+  langBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    setLangMenu(langBtn.getAttribute('aria-expanded') !== 'true');
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.lang')) setLangMenu(false);
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') setLangMenu(false);
+  });
+
+  langMenu.addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-lang]');
+    if (!btn) return;
+    const map = { en: 'GLOBAL | ENGLISH', zh: 'GLOBAL | 中文', fr: 'GLOBAL | FRANÇAIS' };
+    langLabel.textContent = map[btn.dataset.lang];
+    setLangMenu(false);
+    langBtn.focus();
+  });
 };
-langBtn?.addEventListener('click', () => setLangMenu(langBtn?.getAttribute('aria-expanded') !== 'true'));
-document.addEventListener('click', e => { if (!e.target.closest('.lang')) setLangMenu(false); });
-document.addEventListener('keydown', e => { if (e.key === 'Escape') setLangMenu(false); });
-langMenu?.addEventListener('click', e => {
-  const btn = e.target.closest('button[data-lang]');
-  if (!btn) return;
-  const map = { en: 'GLOBAL | ENGLISH', zh: 'GLOBAL | 中文', fr: 'GLOBAL | FRANÇAIS' };
-  if (langLabel && map[btn.dataset.lang]) langLabel.textContent = map[btn.dataset.lang];
-  setLangMenu(false);
-  langBtn?.focus();
-});
+
+setupLanguageMenu();
 
 // ===== MOBILE MENU =====
 const mobileMenuBtn = document.getElementById('mobileMenuBtn');
