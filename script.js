@@ -194,7 +194,7 @@ if (heroTrack) {
 // ===== SCROLLER CONTROLS =====
 const initScrollerControls = () => {
   const wireScroller = (scroller) => {
-    if (!scroller || scroller.classList.contains('wired')) return;
+    if (!scroller || scroller.classList.contains('wired') || scroller.classList.contains('no-controls')) return;
     scroller.classList.add('wired');
 
     let wrap = scroller.parentElement;
@@ -265,16 +265,12 @@ const initScrollerControls = () => {
 
     btnPrev.addEventListener('click', (e) => {
       e.preventDefault();
-      const idx = getCenterIndex();
-      if (idx > 0) scrollToIndex(idx - 1);
-      scrollByAmount(-Math.round(scroller.clientWidth * 0.7));
+      scroller.scrollBy({ left: -Math.round(scroller.clientWidth * 0.85), behavior: 'smooth' });
     });
 
     btnNext.addEventListener('click', (e) => {
       e.preventDefault();
-      const idx = getCenterIndex();
-      if (idx < items.length - 1) scrollToIndex(idx + 1);
-      scrollByAmount(Math.round(scroller.clientWidth * 0.7));
+      scroller.scrollBy({ left: Math.round(scroller.clientWidth * 0.85), behavior: 'smooth' });
     });
 
     let t = null;
