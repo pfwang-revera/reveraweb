@@ -35,7 +35,7 @@ const setupLanguageMenu = () => {
   langMenu.addEventListener('click', (e) => {
     const btn = e.target.closest('button[data-lang]');
     if (!btn) return;
-    const map = { en: 'GLOBAL | ENGLISH', zh: 'GLOBAL | 中文', fr: 'GLOBAL | FRANÇAIS' };
+    const map = { en: 'GLOBAL | ENGLISH', zh: 'CHINESE | 中文', fr: 'FRENCH | FRANÇAIS' };
     langLabel.textContent = map[btn.dataset.lang];
     setLangMenu(false);
     langBtn.focus();
