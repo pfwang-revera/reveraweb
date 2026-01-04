@@ -70,10 +70,12 @@ const initHeroCarousel = () => {
   if (heroTrack) {
     heroTrack.innerHTML = '';
     imagePaths.forEach((p, i) => {
-      const art = document.createElement('article');
+      const art = document.createElement('div');
       art.className = 'slide';
+      art.style.flex = '0 0 100%';
+      art.style.width = '100%';
       art.setAttribute('data-title', `Image ${i+1}`);
-      art.innerHTML = `<div class="slide-inner"><img class="slide-img" src="${encodeURI(p)}" alt="Hero image ${i+1}"></div>`;
+      art.innerHTML = `<img class="slide-img" src="${encodeURI(p)}" alt="Hero image ${i+1}">`;
       heroTrack.appendChild(art);
     });
 
@@ -94,6 +96,58 @@ const initHeroCarousel = () => {
         dotsWrap.appendChild(b);
       });
     };
+
+    const setDots = idx => {
+      Array.from(dotsWrap?.children || []).forEach((d, i) => d.setAttribute('aria-current', String(i === idx)));
+    };
+
+    const goTo = (idx) => {
+      heroIndex = (idx + slides.length) % slides.length;
+      const target = slides[heroIndex];
+      heroTrack.scrollTo({ left: target.offsetLeft, behavior: 'smooth' });
+      setDots(heroIndex);
+      if (playing) restartTimer();
+    };
+
+    const next = () => goTo(heroIndex + 1);
+    const prev = () => goTo(heroIndex - 1);
+
+    const stopTimer = () => { if (timer) clearInterval(timer); timer = null; };
+    const restartTimer = () => {
+      stopTimer();
+      if (playing) timer = setInterval(next, 3000);
+    };
+
+    const setPlayState = isPlaying => {
+      playing = isPlaying && !reduceMotion.matches;
+      btnPP?.setAttribute('aria-pressed', String(playing));
+      if (playing) {
+        if (ppLabel) ppLabel.textContent = 'Pause';
+        if (ppIcon) ppIcon.innerHTML = '<path fill="currentColor" d="M7 6a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H8a1 1 0 0 1-1 1Zm6 0a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H8a1 1 0 0 1-1 1Z"/>';
+        restartTimer();
+      } else {
+        if (ppLabel) ppLabel.textContent = 'Play';
+        if (ppIcon) ppIcon.innerHTML = '<path fill="currentColor" d="M8 5a1 1 0 0 1 1v12a1 1 0 0 1-2 0V6a1 1 0 0 1 1-1H8a1 1 0 0 1-1 1Zm10 6.5a1 1 0 0 1 0 1.7l-8 5A1 1 0 0 1 1.5-.9l8 5Z"/>';
+        stopTimer();
+      }
+    };
+
+    btnNext?.addEventListener('click', next);
+    btnPrev?.addEventListener('click', prev);
+    btnPP?.addEventListener('click', () => setPlayState(!playing));
+
+    heroTrack.addEventListener('scroll', () => {
+      const currentIndex = Math.round(heroTrack.scrollLeft / heroTrack.offsetWidth);
+      heroIndex = currentIndex;
+      setDots(heroIndex);
+    }, { passive: true });
+
+    buildDots();
+    setDots(0);
+    goTo(0);
+    setPlayState(playing);
+  }
+};
 
     const setDots = idx => {
       Array.from(dotsWrap?.children || []).forEach((d, i) => d.setAttribute('aria-current', String(i === idx)));
