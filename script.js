@@ -44,6 +44,114 @@ const setupLanguageMenu = () => {
 
 setupLanguageMenu();
 
+// ===== HERO CAROUSEL =====
+const initHeroCarousel = () => {
+  const heroTrack = document.getElementById('heroTrack');
+  const dotsWrap = document.getElementById('heroDots');
+  const btnPrev = document.getElementById('heroPrev');
+  const btnNext = document.getElementById('heroNext');
+  const btnPP = document.getElementById('heroPlayPause');
+  const ppIcon = document.getElementById('ppIcon');
+  const ppLabel = document.getElementById('ppLabel');
+
+  const imagePaths = [
+    './Images/Landing/Eames chair.jpeg',
+    './Images/Landing/Flowerpot-VP2_Cobalt-Blue-Twilight-Blue-Pattern_-Front_On-1200x1600.jpg',
+    './Images/Landing/Flowerpot lamps.jpg',
+    './Images/Landing/Cosmetics.jpg',
+    './Images/Landing/peacoat.jpeg',
+    './Images/Landing/Petra-VB3_Sheepskin-Moonlight-17mm-w.-Oak-1200x1600.jpg',
+    './Images/Landing/DPP.PNG',
+    './Images/Landing/EU Commission.webp',
+    './Images/Landing/Flowerpot-VP10_Black-and-white-pattern_off-1200x1600.jpg',
+    './Images/Landing/SBUX interior.webp'
+  ];
+
+  if (heroTrack) {
+    heroTrack.innerHTML = '';
+    imagePaths.forEach((p, i) => {
+      const art = document.createElement('article');
+      art.className = 'slide';
+      art.setAttribute('data-title', `Image ${i+1}`);
+      art.innerHTML = `<div class="slide-inner"><img class="slide-img" src="${encodeURI(p)}" alt="Hero image ${i+1}"></div>`;
+      heroTrack.appendChild(art);
+    });
+
+    let slides = Array.from(heroTrack.querySelectorAll('.slide'));
+    let heroIndex = 0;
+    let playing = !reduceMotion.matches;
+    let timer = null;
+
+    const buildDots = () => {
+      if (!dotsWrap) return;
+      dotsWrap.innerHTML = '';
+      slides.forEach((_, i) => {
+        const b = document.createElement('button');
+        b.className = 'dot';
+        b.type = 'button';
+        b.setAttribute('aria-label', `Go to image ${i+1}`);
+        b.addEventListener('click', () => goTo(i, true));
+        dotsWrap.appendChild(b);
+      });
+    };
+
+    const setDots = idx => {
+      Array.from(dotsWrap?.children || []).forEach((d, i) => d.setAttribute('aria-current', String(i === idx)));
+    };
+
+    const goTo = (idx, userInitiated = false) => {
+      heroIndex = (idx + slides.length) % slides.length;
+      const target = slides[heroIndex];
+      heroTrack.scrollTo({ left: target.offsetLeft, behavior: reduceMotion.matches ? 'auto' : 'smooth' });
+      setDots(heroIndex);
+      if (userInitiated && playing) restartTimer();
+    };
+
+    const next = () => goTo(heroIndex + 1, true);
+    const prev = () => goTo(heroIndex - 1, true);
+
+    const stopTimer = () => { if (timer) clearInterval(timer); timer = null; };
+    const restartTimer = () => {
+      stopTimer();
+      if (playing) timer = setInterval(() => goTo(heroIndex + 1, false), 5000);
+    };
+
+    const setPlayState = isPlaying => {
+      playing = isPlaying && !reduceMotion.matches;
+      btnPP?.setAttribute('aria-pressed', String(playing));
+      if (playing) {
+        if (ppLabel) ppLabel.textContent = 'Pause';
+        if (ppIcon) ppIcon.innerHTML = '<path fill="currentColor" d="M7 6a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H8a1 1 0 0 1-1 1Zm6 0a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1Z"/>';
+        restartTimer();
+      } else {
+        if (ppLabel) ppLabel.textContent = 'Play';
+        if (ppIcon) ppIcon.innerHTML = '<path fill="currentColor" d="M8 5a1 1 0 0 1 1v12a1 1 0 0 1-2 0V6a1 1 0 0 1 1-1H8a1 1 0 0 1-1 1Zm10 6.5a1 1 0 0 1 0 1.7l-8 5A1 1 0 0 1 1.5-.9l8 5Z"/>';
+        stopTimer();
+      }
+    };
+
+    btnNext?.addEventListener('click', next);
+    btnPrev?.addEventListener('click', prev);
+    btnPP?.addEventListener('click', () => setPlayState(!playing));
+
+    let scrollEndT = null;
+    heroTrack.addEventListener('scroll', () => {
+      if (scrollEndT) clearTimeout(scrollEndT);
+      scrollEndT = setTimeout(() => {
+        heroIndex = nearestIndex();
+        setDots(heroIndex);
+      }, 80);
+    }, { passive: true });
+
+    buildDots();
+    setDots(0);
+    goTo(0, false);
+    setPlayState(playing);
+  }
+};
+
+initHeroCarousel();
+
 // ===== MOBILE MENU =====
 const mobileMenuBtn = document.getElementById('mobileMenuBtn');
 const mobileMenu = document.getElementById('mobileMenu');
@@ -213,6 +321,7 @@ const initTimelineStepper = () => {
 const initAll = () => {
   initScrollerControls();
   initTimelineStepper();
+  initHeroCarousel();
 };
 
 if (document.readyState === 'loading') {
