@@ -373,34 +373,6 @@ const initTimelineStepper = () => {
   setTimeout(updateLine, 100);
 };
 
-  const pathLen = draw.getTotalLength();
-  draw.style.strokeDasharray = `${pathLen} ${pathLen}`;
-  draw.style.strokeDashoffset = pathLen;
-  draw.classList.add('timeline-draw');
-  draw.getBoundingClientRect();
-
-  const update = () => {
-    const rect = container.getBoundingClientRect();
-    const vh = window.innerHeight;
-    const progress = Math.max(0, Math.min(1, (vh - rect.top) / (vh + rect.height)));
-    draw.style.strokeDashoffset = Math.round(pathLen * (1 - progress));
-  };
-
-  const steps = container.querySelectorAll('.timeline-step');
-  const io = new IntersectionObserver(entries => {
-    entries.forEach(e => {
-      if (e.isIntersecting) e.target.classList.add('is-visible');
-      else e.target.classList.remove('is-visible');
-    });
-  }, { threshold: 0.35 });
-  steps.forEach(s => { s.classList.add('is-hidden'); io.observe(s); });
-
-  window.addEventListener('scroll', update, { passive: true });
-  window.addEventListener('resize', update);
-  update();
-  return true;
-};
-
 // ===== SCROLLER PROGRESS CURVE =====
 const initScrollerProgress = () => {
   const wireProgress = (scroller) => {
