@@ -1,0 +1,18 @@
+Keystone site: language structure (v22)
+
+  /            English (default, x-default)
+  /fr/         French      <html lang="fr">
+  /zh/         Simplified Chinese  <html lang="zh-Hans">
+
+- Every language folder has the same file names as the English root.
+- Shared assets stay at the root (styles.css, site.js, images/, fonts/); translated pages reference them with ../
+- Each page carries canonical + hreflang links (en, fr, zh-Hans, x-default) pointing at https://www.revera8.com/...
+- site.js reads <html lang> and renders the header, footer and language menu in that language. The menu links to the same page in the other languages. UI strings for the shared header/footer live in the T{} dictionary in site.js.
+- Chinese uses system CJK fonts (PingFang SC / Microsoft YaHei / Noto Sans SC; Songti / Noto Serif SC for headings).
+- privacy.html and terms.html translations carry a note that the English version is binding. Have them legally reviewed before publishing.
+
+Adding a language (e.g. German):
+  1. Copy the English pages into /de/, set <html lang="de">, fix ../ asset paths, canonical, og:url, og:locale.
+  2. Add de to the hreflang block on every page (all languages).
+  3. Add {code:'de',...} to LANGS and a T.de dictionary in site.js; remove Deutsch from SOON.
+  4. Translate. When English content changes, update /fr/ and /zh/ too.
